@@ -1,8 +1,11 @@
-FROM fedora:latest
+FROM koji/image-build
+MAINTAINER Luiz Carvalho <lucarval@redhat.com>
 
-LABEL "com.redhat.component"="docker-hello-world" \
-      "name"="lucarval/docker-hello-world" \
-      "version"="1.0"
+LABEL "name"="lucarval/rhel7" \
+      "version"="7.2.lucarval" \
+      "com.redhat.component"="docker-hello-world"
 
-ENV x=y
-RUN uname -a && env
+ENV container docker
+ENV PATH /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin
+
+CMD ["/usr/bin/bash"]
