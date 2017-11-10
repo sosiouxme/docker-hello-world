@@ -1,8 +1,9 @@
-FROM fedora:latest
+FROM rhel7:7-released
 
 LABEL "com.redhat.component"="docker-hello-world" \
       "name"="lucarval/docker-hello-world" \
-      "version"="1.0"
+      "version"="1.0.lucarval"
 
-ENV x=y
-RUN uname -a && env
+RUN curl -vm 5 --head http://indy.cloud.pnc.engineering.redhat.com/
+RUN curl -vm 5 --head https://indy.cloud.pnc.engineering.redhat.com/
+
