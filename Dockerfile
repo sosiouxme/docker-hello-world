@@ -1,4 +1,4 @@
-FROM rhel7:7-released
+FROM rhel7:7.2
 
 LABEL "com.redhat.component"="docker-hello-world" \
       "name"="lucarval/docker-hello-world" \
