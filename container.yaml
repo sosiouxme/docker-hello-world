@@ -1,4 +1,4 @@
 compose:
   packages:
   - libdnet
-  signing_intent: release
+  signing_intent: unsigned
