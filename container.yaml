@@ -1,0 +1,4 @@
+compose:
+  packages:
+  - libdnet
+  signing_intent: release
