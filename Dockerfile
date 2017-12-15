@@ -1,8 +1,8 @@
 FROM fedora:latest
 
-LABEL "com.redhat.component"="docker-hello-world" \
-      "name"="lucarval/docker-hello-world" \
-      "version"="1.0"
+LABEL "BZComponent"="docker-hello-world" \
+      "Name"="lucarval/docker-hello-world" \
+      "Version"="1.0"
 
 ENV x=y
 RUN uname -a && env
