@@ -42,8 +42,9 @@ CMD ["./run.sh"]
 LABEL \
         io.k8s.description="Kibana container for querying Elasticsearch for aggregated logs" \
         com.redhat.component="logging-kibana5-container" \
+        "com.redhat.component"="docker-hello-world" \
+        "name"="sosiouxme/docker-hello-world" \
         vendor="Red Hat" \
-        name="openshift3/ose-logging-kibana5" \
         License="GPLv2+" \
         io.k8s.display-name="Kibana" \
         version="v3.11.0" \
