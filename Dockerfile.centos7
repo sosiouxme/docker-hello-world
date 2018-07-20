@@ -4,12 +4,13 @@ MAINTAINER OpenShift Development <dev@lists.openshift.redhat.com>
 
 EXPOSE 5601
 
-ENV ELASTICSEARCH_URL=https://logging-es:9200 \
+ENV ES_HOST=localhost \
+    ES_PORT=9200 \
     HOME=/opt/app-root/src \
-    KIBANA_BIN=/usr/share/kibana/bin/kibana \
-    KIBANA_CONF_DIR=/etc/kibana \
-    KIBANA_HOME=/usr/share/kibana \
-    KIBANA_VER=5.6.10 \
+    KIBANA_HOME=/opt/kibana \
+    KIBANA_CONF_DIR=/opt/kibana/config \
+    KIBANA_VER=4.6.4 \
+    NODE_BIN=/opt/kibana/node/bin/node \
     RELEASE_STREAM=origin
 
 LABEL io.k8s.description="Kibana container for querying Elasticsearch for aggregated logs" \
@@ -19,14 +20,14 @@ LABEL io.k8s.description="Kibana container for querying Elasticsearch for aggreg
 
 ADD kibana.repo /etc/yum.repos.d/kibana.repo
 # install the RPMs in a separate step so it can be cached
-RUN rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch && \
+RUN rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch && \
     INSTALLED_PKGS="kibana-${KIBANA_VER}" && \
     yum install -y --setopt=tsflags=nodocs  ${INSTALLED_PKGS} && \
     yum clean all
 
 ADD probe/ /usr/share/kibana/probe/
 ADD kibana.yml ${KIBANA_CONF_DIR}/
-ADD lib/* ${HOME}/
+ADD lib/origin-kibana ${KIBANA_HOME}/installedPlugins/origin-kibana
 ADD run.sh utils install.sh prep-install.${RELEASE_STREAM} ${HOME}/
 RUN ${HOME}/install.sh
 

@@ -1,55 +1,46 @@
-FROM centos/nodejs-6-centos7
+FROM rhscl/nodejs-6-rhel7
 
 MAINTAINER OpenShift Development <dev@lists.openshift.redhat.com>
 
 EXPOSE 5601
 
-ENV ELASTICSEARCH_URL=https://logging-es:9200 \
+ENV ES_HOST=localhost \
+    ES_PORT=9200 \
     HOME=/opt/app-root/src  \
-    KIBANA_BIN=/usr/share/kibana/bin/kibana \
-    KIBANA_CONF_DIR=/etc/kibana \
     KIBANA_HOME=/usr/share/kibana \
-    KIBANA_VER=5.6.10 \
-    NODE_BIN=nodescl-node \
+    KIBANA_CONF_DIR=/etc/kibana \
+    CONFIG_PATH=/etc/kibana \
     NODE_ENV=production \
-    RELEASE_STREAM=prod \
-    container=oci
+    KIBANA_VER=4.6.4 \
+    NODE_BIN=nodescl-node \
+    RELEASE_STREAM=prod
 
-ARG LOCAL_REPO
+LABEL io.k8s.description="Kibana container for querying Elasticsearch for aggregated logs" \
+      io.k8s.display-name="Kibana" \
+      io.openshift.expose-services="5601:http" \
+      io.openshift.tags="logging,elk,kibana" \
+      com.redhat.component=logging-kibana-docker \
+      architecture=x86_64 \
+      name="openshift3/logging-kibana" \
+      version="3.6.0" \
+      release="1"
 
 USER 0
 
-RUN if [ -n "${LOCAL_REPO}" ] ; then \
-     curl -s -o /etc/yum.repos.d/local.repo ${LOCAL_REPO} ; \
-    fi
-
-RUN INSTALLED_PKGS="kibana-${KIBANA_VER}*" && \
+RUN yum repolist > /dev/null && \
+    yum-config-manager --enable rhel-7-server-ose-3.6-rpms && \
+    yum-config-manager --disable epel >/dev/null || : && \
+    INSTALLED_PKGS="kibana-${KIBANA_VER}" && \
     yum install -y --setopt=tsflags=nodocs  ${INSTALLED_PKGS} && \
+    rpm -V ${INSTALLED_PKGS} && \
     yum clean all
 
 ADD nodescl-node /usr/bin
 ADD probe/ /usr/share/kibana/probe/
+ADD lib/origin-kibana ${KIBANA_HOME}/installedPlugins/origin-kibana
 ADD kibana.yml ${KIBANA_CONF_DIR}/
-ADD lib/* ${HOME}/
 ADD run.sh utils install.sh prep-install.${RELEASE_STREAM} ${HOME}/
-ADD logo-OCP-console-hdr-thin.svg ${KIBANA_HOME}/installedPlugins/origin-kibana/public/images/logo-origin-thin.svg
-RUN (type -p node || ln -s $(which $NODE_BIN) "/usr/bin/node") && \
-    sh ${HOME}/install.sh
+RUN sh ${HOME}/install.sh
 
 WORKDIR ${HOME}
 CMD ["./run.sh"]
-
-LABEL \
-        io.k8s.description="Kibana container for querying Elasticsearch for aggregated logs" \
-        com.redhat.component="logging-kibana5-container" \
-        "com.redhat.component"="docker-hello-world" \
-        "name"="sosiouxme/docker-hello-world" \
-        vendor="Red Hat" \
-        License="GPLv2+" \
-        io.k8s.display-name="Kibana" \
-        version="v3.11.0" \
-        architecture="x86_64" \
-        release="0.69.0.0" \
-        io.openshift.expose-services="5601:http" \
-        io.openshift.tags="logging,elk,kibana"
-
